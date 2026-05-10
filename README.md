@@ -6,6 +6,12 @@ Windows desktop wrapper for a local HTML prompt-configuration dashboard. The app
 
 ![Nano Banana Prompt Helper screenshot](docs/app-screenshot.png)
 
+## Download
+
+The current Windows executable is included in this repository:
+
+[Download NanoBananaPromptHelper.exe](release/NanoBananaPromptHelper.exe)
+
 ## Features
 
 - Single-file Windows executable output
@@ -20,17 +26,22 @@ Windows desktop wrapper for a local HTML prompt-configuration dashboard. The app
 
 ```text
 .
-├── assets/
-│   ├── AppIcon.ico
-│   ├── Logo.png
-│   └── Splash.jpg
-├── scripts/
-│   └── build.ps1
-├── src/
-│   ├── NanoBananaPromptHelper.App.cs
-│   └── NanoBananaPromptHelper.html
-├── .gitignore
-└── README.md
+|-- assets/
+|   |-- AppIcon.ico
+|   |-- Logo.png
+|   `-- Splash.jpg
+|-- docs/
+|   |-- BUILD.md
+|   `-- app-screenshot.png
+|-- release/
+|   `-- NanoBananaPromptHelper.exe
+|-- scripts/
+|   `-- build.ps1
+|-- src/
+|   |-- NanoBananaPromptHelper.App.cs
+|   `-- NanoBananaPromptHelper.html
+|-- .gitignore
+`-- README.md
 ```
 
 ## Requirements
@@ -83,6 +94,7 @@ After editing either file, run the build script again.
 - The generated `.exe` embeds the HTML app, logo, splash image, icon resources, and WebView2 loader files.
 - At runtime the app extracts internal files into `%LocalAppData%\NanoBananaPromptHelper\Runtime\<process-id>`.
 - `dist/` and `dist-single/` are build outputs and are intentionally ignored by Git.
+- `release/NanoBananaPromptHelper.exe` is committed for convenient direct download.
 
 ## License
 
