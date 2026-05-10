@@ -1,0 +1,22 @@
+# Build outputs
+dist/
+dist-single/
+bin/
+obj/
+
+# Local dependency caches
+packages/
+
+# Runtime and temp files
+*.log
+*.tmp
+*.cache
+
+# Windows / editor noise
+Thumbs.db
+Desktop.ini
+.vs/
+.vscode/
+
+# Generated source image kept out by default
+source-image.jpeg

@@ -1,0 +1,25 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Restore WebView2 SDK
+        run: nuget install Microsoft.Web.WebView2 -Version 1.0.2903.40 -OutputDirectory packages
+
+      - name: Build
+        shell: pwsh
+        run: .\scripts\build.ps1
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NanoBananaPromptHelper
+          path: dist-single\NanoBananaPromptHelper.exe
