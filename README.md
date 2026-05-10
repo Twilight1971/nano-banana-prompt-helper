@@ -98,4 +98,4 @@ After editing either file, run the build script again.
 
 ## License
 
-No license has been selected yet. Add a `LICENSE` file before publishing publicly if you want to define reuse rights.
+This project is licensed under the [MIT License](LICENSE).
