@@ -2,6 +2,10 @@
 
 Windows desktop wrapper for a local HTML prompt-configuration dashboard. The app opens as a single `.exe`, uses Microsoft Edge WebView2 for modern browser rendering, includes a custom icon/logo/splashscreen, and exports the generated configuration as JSON.
 
+## Screenshot
+
+![Nano Banana Prompt Helper screenshot](docs/app-screenshot.png)
+
 ## Features
 
 - Single-file Windows executable output

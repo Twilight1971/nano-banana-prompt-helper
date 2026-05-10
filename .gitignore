@@ -11,6 +11,7 @@ packages/
 *.log
 *.tmp
 *.cache
+docs/screenshot-preview/
 
 # Windows / editor noise
 Thumbs.db
