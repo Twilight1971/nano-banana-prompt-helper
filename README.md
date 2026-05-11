@@ -2,6 +2,12 @@
 
 Windows desktop wrapper for a local HTML prompt-configuration dashboard. The app opens as a single `.exe`, uses Microsoft Edge WebView2 for modern browser rendering, includes a custom icon/logo/splashscreen, and exports the generated configuration as JSON.
 
+## About
+
+Nano Banana Prompt Helper is a compact desktop tool for building structured image-generation prompt configurations. It combines an editable form-based dashboard with a live JSON preview, so prompt parameters can be adjusted, imported, copied, reset, and exported without manually editing raw JSON.
+
+The project is built as a lightweight Windows WebView2 wrapper around a self-contained HTML app. This keeps the source easy to inspect and modify while still providing a native `.exe` build workflow.
+
 ## Screenshot
 
 ![Nano Banana Prompt Helper screenshot](docs/app-screenshot.png)
