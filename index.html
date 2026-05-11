@@ -1,0 +1,1022 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#020617">
+<title>Nano Banana Prompt Configurator</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="Logo.png" type="image/png">
+<style>
+  :root {
+    --bg: #020617;
+    --bg-soft: #070b16;
+    --surface: #0f172a;
+    --surface2: #111c33;
+    --surface3: #18243d;
+    --border: #26354f;
+    --border-strong: #3d5275;
+    --accent: #f6c445;
+    --accent2: #22c55e;
+    --accent-blue: #38bdf8;
+    --accent-glow: rgba(246,196,69,.18);
+    --text: #f8fafc;
+    --text-dim: #a7b0c4;
+    --text-muted: #737f99;
+    --danger: #fb7185;
+    --success: #4ade80;
+    --radius: 10px;
+    --radius-sm: 7px;
+    --shadow: 0 18px 50px rgba(0,0,0,.45);
+    --focus: 0 0 0 3px rgba(56,189,248,.28);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:radial-gradient(circle at 20% -10%,rgba(56,189,248,.12),transparent 28%),linear-gradient(180deg,var(--bg),#050814 48%,var(--bg));color:var(--text);line-height:1.55;min-height:100vh;overflow-x:hidden}
+  .skip-link{position:absolute;left:16px;top:-48px;background:var(--accent-blue);color:#00111f;padding:10px 14px;border-radius:var(--radius-sm);font-weight:700;z-index:9999;transition:top .2s}
+  .skip-link:focus{top:12px}
+  .motion-ready .header{animation:slideDown .42s cubic-bezier(.2,.8,.2,1) both}
+  .motion-ready .command-bar{animation:fadeUp .46s cubic-bezier(.2,.8,.2,1) both .08s}
+  .motion-ready .side-nav{animation:fadeRight .46s cubic-bezier(.2,.8,.2,1) both .14s}
+  .motion-ready .preview-panel{animation:fadeLeft .46s cubic-bezier(.2,.8,.2,1) both .18s}
+  
+  /* HEADER */
+  .header{background:rgba(2,6,23,.86);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:100;backdrop-filter:blur(16px)}
+  .header-inner{max-width:1560px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+  .brand{display:flex;align-items:center;gap:14px;min-width:0}
+  .logo-icon{width:54px;height:54px;border-radius:12px;object-fit:cover;box-shadow:0 0 22px rgba(246,196,69,.34);border:1px solid rgba(246,196,69,.42);flex:0 0 auto;animation:logoGlow 4.8s ease-in-out infinite}
+  .brand-copy{min-width:0}
+  .brand-kicker{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-blue);font-weight:700;margin-bottom:1px}
+  .brand h1{font-size:1.35rem;font-weight:750;color:var(--text);letter-spacing:0;line-height:1.12}
+  .brand span{font-size:.84rem;color:var(--text-dim);display:block;margin-top:4px}
+  .header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  
+  /* BUTTONS */
+  .btn{min-height:38px;padding:8px 15px;border-radius:var(--radius-sm);border:1px solid var(--border);background:linear-gradient(180deg,var(--surface3),var(--surface2));color:var(--text);cursor:pointer;font-size:.84rem;font-weight:650;transition:background .2s,border-color .2s,color .2s,box-shadow .2s;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+  .btn:hover{border-color:var(--accent);background:rgba(246,196,69,.12)}
+  .btn:active{transform:translateY(1px) scale(.985)}
+  .btn:focus-visible,.nav-item:focus-visible,.section-header:focus-visible,.tab:focus-visible{outline:none;box-shadow:var(--focus)}
+  .btn-primary{background:linear-gradient(180deg,#ffd65e,var(--accent));color:#111827;border-color:#facc15;font-weight:750}
+  .btn-primary:hover{background:linear-gradient(180deg,#ffe087,#f6c445);border-color:#fde047}
+  .btn-danger{border-color:var(--danger);color:var(--danger)}
+  .btn-danger:hover{background:rgba(224,85,101,.15)}
+  .btn-icon{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;color:currentColor;border-radius:5px;background:rgba(255,255,255,.1);font-size:.72rem;font-weight:900;line-height:1}
+  
+  /* LAYOUT */
+  .app-shell{max-width:1560px;margin:0 auto;padding:18px 24px 28px}
+  .command-bar{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;margin-bottom:18px}
+  .status-strip{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .stat{border:1px solid var(--border);background:rgba(15,23,42,.82);border-radius:var(--radius-sm);padding:9px 12px;min-width:118px}
+  .stat-label{display:block;font-size:.67rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);font-weight:800}
+  .stat-value{display:block;font-size:.95rem;color:var(--text);font-weight:750;line-height:1.2;margin-top:2px}
+  .layout{display:grid;grid-template-columns:240px minmax(0,1fr) 430px;gap:18px;align-items:start}
+  .side-nav{position:sticky;top:100px;background:rgba(15,23,42,.78);border:1px solid var(--border);border-radius:var(--radius);padding:10px;max-height:calc(100vh - 124px);overflow:auto}
+  .side-nav-title{padding:6px 8px 10px;color:var(--text-muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.14em;font-weight:850}
+  .nav-item{width:100%;border:0;background:transparent;color:var(--text-dim);display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;padding:9px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:.82rem;font-weight:650;transition:background .2s,color .2s,transform .2s}
+  .nav-item:hover,.nav-item.active{background:rgba(56,189,248,.12);color:var(--text)}
+  .nav-item:hover{transform:translateX(2px)}
+  .nav-dot{width:7px;height:7px;border-radius:50%;background:var(--border-strong);flex:0 0 auto}
+  .nav-item.active .nav-dot{background:var(--accent2);box-shadow:0 0 12px rgba(34,197,94,.55)}
+  .main-content{min-width:0}
+  @media(max-width:1180px){.layout{grid-template-columns:210px minmax(0,1fr)}.preview-panel{grid-column:2}.command-bar{grid-template-columns:1fr}.status-strip{justify-content:flex-start}}
+  @media(max-width:860px){.header-inner{align-items:flex-start;flex-direction:column}.header-actions{width:100%;justify-content:flex-start}.app-shell{padding:14px 14px 24px}.layout{grid-template-columns:1fr}.side-nav{position:relative;top:auto;max-height:none;display:flex;gap:6px;overflow:auto}.side-nav-title{display:none}.nav-item{min-width:max-content}.preview-panel{grid-column:auto}.command-bar{gap:12px}.status-strip{display:none}}
+  
+  /* SECTIONS */
+  .section{background:linear-gradient(180deg,rgba(15,23,42,.98),rgba(10,16,30,.98));border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;box-shadow:0 1px 0 rgba(255,255,255,.02) inset;scroll-margin-top:112px;transform-origin:top center}
+  .section.motion-enter{opacity:0;transform:translateY(18px) scale(.985)}
+  .section.motion-visible{animation:sectionIn .44s cubic-bezier(.2,.8,.2,1) both}
+  .section-header{padding:15px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;transition:background .2s,border-color .2s}
+  .section-header:hover{background:rgba(56,189,248,.08)}
+  .section-header h2{font-size:1rem;font-weight:750;display:flex;align-items:center;gap:8px;color:var(--text)}
+  .section-header .toggle{transition:transform .25s;color:var(--accent-blue);font-size:.9rem;font-weight:900}
+  .section-header.collapsed .toggle{transform:rotate(-90deg)}
+  .section-body{padding:0 18px 18px;display:grid;gap:14px;transform-origin:top center}
+  .section-body.hidden{display:none}
+  .subsection h3{font-size:.76rem!important;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)!important;margin-bottom:10px!important;padding-bottom:7px!important;border-bottom:1px solid var(--border)!important}
+  
+  /* FORM ELEMENTS */
+  .field{display:grid;gap:7px;min-width:0}
+  .field label{font-size:.72rem;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em}
+  .field input[type="text"],.field input[type="number"],.field textarea,.field select{
+    background:#050a16;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:10px 12px;font-size:.9rem;font-family:inherit;transition:border-color .2s,box-shadow .2s,background .2s,transform .2s;width:100%;max-width:100%}
+  .field input:hover,.field textarea:hover,.field select:hover{border-color:var(--border-strong)}
+  .field input:focus,.field textarea:focus,.field select:focus{transform:translateY(-1px)}
+  .field input:focus,.field textarea:focus,.field select:focus,.search-input:focus{outline:none;border-color:var(--accent-blue);box-shadow:var(--focus);background:#071022}
+  .field textarea{resize:vertical;min-height:92px}
+  .field select{cursor:pointer}
+  .field select option{background:var(--surface);color:var(--text)}
+  
+  /* SLIDER */
+  .slider-field{display:grid;gap:8px}
+  .slider-field label{font-size:.8rem;font-weight:500;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between}
+  .slider-field label .val{color:var(--accent);font-weight:700;font-family:'Courier New',monospace;font-size:.95rem}
+  .slider-wrap{display:flex;align-items:center;gap:12px}
+  input[type="range"]{flex:1;-webkit-appearance:none;height:7px;background:#050a16;border-radius:999px;outline:none;border:1px solid var(--border)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 0 10px rgba(246,196,69,.45)}
+  input[type="range"]:focus-visible{box-shadow:var(--focus)}
+  .slider-value{min-width:50px;text-align:center;font-family:'Courier New',monospace;color:var(--accent);font-weight:700;font-size:.95rem}
+  
+  /* TAGS */
+  .tags-container{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .tag{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.24);border-radius:999px;padding:5px 10px;font-size:.78rem;display:flex;align-items:center;gap:8px;transition:border-color .2s,background .2s}
+  .tag:hover{border-color:var(--danger);background:rgba(251,113,133,.1)}
+  .tag.motion-new{animation:popIn .28s cubic-bezier(.2,.9,.2,1.2) both}
+  .tag .remove{cursor:pointer;color:var(--danger);font-weight:700;font-size:.9rem;line-height:1}
+  .tag-input-wrap{display:flex;gap:8px;margin-top:8px}
+  .tag-input-wrap input{flex:1}
+  
+  /* JSON PREVIEW */
+  .preview-panel{position:sticky;top:100px;min-width:0}
+  .preview-box{background:rgba(15,23,42,.92);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  .preview-header{padding:14px 16px;background:linear-gradient(180deg,var(--surface3),var(--surface2));border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .preview-header h3{font-size:.9rem;font-weight:800}
+  .preview-content{padding:0;max-height:calc(100vh - 172px);overflow:auto}
+  .preview-content pre{padding:16px;font-family:Consolas,'Courier New',monospace;font-size:.78rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;margin:0;color:var(--text-dim)}
+  .preview-content pre .key{color:#7ec8e3}
+  .preview-content pre .string{color:#a8e6a1}
+  .preview-content pre .number{color:var(--accent)}
+  .preview-content pre .bool{color:#c89ee6}
+  
+  /* SEARCH */
+  .search-bar{width:100%}
+  .search-input{width:100%;padding:12px 14px;background:rgba(15,23,42,.82);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:.94rem;transition:border-color .2s,box-shadow .2s,background .2s}
+  .search-input::placeholder{color:var(--text-muted)}
+  .search-wrap{position:relative}
+  .search-wrap::before{content:"";display:none}
+  
+  /* TOAST */
+  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--success);color:#052e16;padding:12px 22px;border-radius:var(--radius);font-weight:750;font-size:.9rem;opacity:0;transition:transform .3s,opacity .3s;z-index:1000;box-shadow:var(--shadow)}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+  .toast.show{animation:toastPop .3s cubic-bezier(.2,.8,.2,1) both}
+  
+  /* GRID HELPERS */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}}
+  
+  /* TABS */
+  .tabs{display:flex;gap:4px;padding:0 20px 12px;border-bottom:1px solid var(--border);overflow-x:auto}
+  .tab{padding:8px 14px;font-size:.82rem;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+  
+  /* SCROLLBAR */
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--text-dim)}
+  
+  .info-text{font-size:.75rem;color:var(--text-dim);font-style:italic;margin-top:2px}
+  .divider{height:1px;background:var(--border);margin:8px 0}
+  @keyframes slideDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeRight{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes fadeLeft{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes sectionIn{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes popIn{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:scale(1)}}
+  @keyframes toastPop{0%{transform:translateX(-50%) translateY(18px) scale(.96)}100%{transform:translateX(-50%) translateY(0) scale(1)}}
+  @keyframes logoGlow{0%,100%{box-shadow:0 0 20px rgba(246,196,69,.3)}50%{box-shadow:0 0 32px rgba(246,196,69,.52)}}
+  @media (prefers-reduced-motion: reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}.section.motion-enter{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#mainContent">Zum Inhalt springen</a>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <img class="logo-icon" src="Logo.png" alt="Nano Banana Logo">
+      <div class="brand-copy">
+        <div class="brand-kicker">Prompt Studio</div>
+        <h1>Nano Banana Configurator</h1>
+        <span>Prompt Engineering Dashboard v2.0</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn" onclick="resetDefaults()" title="Einstellungen zuruecksetzen"><span class="btn-icon">R</span>Reset</button>
+      <button class="btn" onclick="importJSON()" title="JSON-Datei importieren"><span class="btn-icon">I</span>Import</button>
+      <button class="btn btn-primary" onclick="exportJSON()" title="JSON in die Zwischenablage kopieren"><span class="btn-icon">C</span>Copy JSON</button>
+      <button class="btn btn-primary" onclick="downloadJSON()" title="JSON-Datei herunterladen"><span class="btn-icon">D</span>Download</button>
+    </div>
+  </div>
+</div>
+
+<main class="app-shell">
+  <div class="command-bar">
+    <div class="search-bar">
+      <div class="search-wrap">
+        <input type="text" class="search-input" id="searchInput" placeholder="Suche in Parametern..." oninput="searchFields(this.value)" aria-label="Parameter suchen">
+      </div>
+    </div>
+    <div class="status-strip" aria-label="Konfigurationsstatus">
+      <div class="stat">
+        <span class="stat-label">Sektionen</span>
+        <span class="stat-value" id="sectionCount">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Felder</span>
+        <span class="stat-value" id="fieldCount">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">JSON</span>
+        <span class="stat-value" id="jsonSize">0</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <nav class="side-nav" id="sectionNav" aria-label="Abschnitte">
+      <div class="side-nav-title">Abschnitte</div>
+    </nav>
+
+    <div class="main-content" id="mainContent">
+      <!-- Sections will be generated by JS -->
+    </div>
+
+    <aside class="preview-panel" aria-label="JSON Vorschau">
+      <div class="preview-box">
+        <div class="preview-header">
+          <h3>JSON Vorschau</h3>
+          <span style="font-size:.75rem;color:var(--text-dim)" id="charCount">0 Zeichen</span>
+        </div>
+        <div class="preview-content">
+          <pre id="jsonPreview"></pre>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div class="toast" id="toast">In Zwischenablage kopiert!</div>
+
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileImport(event)">
+
+<script>
+// ============ DEFAULT DATA ============
+const DEFAULT_DATA = {
+  "project_config": {
+    "aesthetic": "Raw UGC / Candid Smartphone Photography",
+    "aspect_ratio": "9:16",
+    "render_target": "4K_look"
+  },
+  "subject": {
+    "description": "early 20s woman with top heavy busty figure, her chest area is prominently displayed, showing large breasts that are visibly full and rounded, candid smartphone selfie",
+    "demographics": "early 20s, identity and all features taken strictly from reference image",
+    "body": {
+      "physique": "slim athletic build, significant mammary volume, prominent thoracic projection, full rounded breast contour with natural soft tissue distribution and slight natural ptosis, toned shoulders and arms, visible clavicle definition, moderate gluteal development",
+      "details": "her chest area is prominently displayed, showing large breasts that are visibly full and rounded, her clothes can barely hide the unproportional breast size, top heavy busty appearance creating natural postural arch, realistic skin texture with visible pores",
+      "skin_tone": "exact skin tone and undertone from reference image"
+    },
+    "face": {
+      "structure": "exact facial structure from reference image, natural slight asymmetry",
+      "expression": "playful inviting expression with confident knowing gaze, heavy-lidded eyes, captivating direct eye contact, lips parted in coy smile",
+      "eyes": "exact eye details, color, shape and micro-features from reference image",
+      "skin": "visible pores on nose cheeks forehead, subtle imperfections, natural matte T-zone, micro-expression lines, realistic under-eye subtle darkness, exact skin texture from reference",
+      "lips": "natural lips with visible lip lines, slight asymmetry, exact color and gloss from reference",
+      "brows": "exact brow shape, thickness and individual hairs from reference"
+    },
+    "hair": {
+      "style": "exact hair style and length from reference image with natural movement",
+      "color": "exact hair color, tones and roots from reference image",
+      "texture": "individual strand separation, flyaway hairs, natural gravity from reference"
+    },
+    "wardrobe": {
+      "top": "fitted heathered grey ribbed tank top with deep plunging neckline that strains and stretches tightly across chest, fabric tension visibly pulling at seams and creating wrinkles",
+      "bottom": "black athletic shorts partially visible beneath blanket",
+      "accessories": "black lace-patterned choker necklace, delicate gold chain with silver star pendant, large silver hoop earrings",
+      "fabric_notes": "thin ribbed cotton fabric stretched to its limit over prominent chest, creating visible strain lines and contour-following wrinkles that emphasize top heavy proportions"
+    }
+  },
+  "identity_lock": {
+    "status": "locked",
+    "scope": "single subject identity preserved (face structure, skin tone, eyes, body proportions, silhouette)",
+    "reference_usage": "use the provided reference image identity only; do not change facial structure, skin tone, eye shape, or overall proportions",
+    "identity_consistency_lock": 1.95,
+    "facial_symmetry_enforcement": 1.1
+  },
+  "nano_banana_pro_facial_parameters": {
+    "identity_consistency_lock": 1.95,
+    "facial_symmetry_enforcement": 1.1,
+    "jawline_definition_scale": 1.05,
+    "cheekbone_prominence_index": 1.03,
+    "nasal_bridge_refinement": 1.0,
+    "orbital_depth_precision": 1.02,
+    "labial_fullness_ratio": 1.04,
+    "microtexture_fidelity_multiplier": 1.08,
+    "subsurface_scattering_intensity": 1.04,
+    "follicular_detail_density": 1.06
+  },
+  "nano_banana_pro_eye_parameters": {
+    "sclera_chroma_neutralization": 1.1,
+    "waterline_anatomical_separation": 1.08,
+    "iris_micro_detail_depth": 1.05,
+    "limbal_ring_definition": 1.03,
+    "pupillary_catchlight_reflectivity": 1.06,
+    "canthus_vascular_fidelity": 1.02,
+    "tear_duct_moisture_index": 1.04,
+    "lower_lid_organic_pigment_scale": 1.07,
+    "corneal_specular_clarity": 1.05,
+    "orbital_crease_definition": 1.01
+  },
+  "nano_banana_pro_eye_morphology_parameters": {
+    "eye_aperture_vertical_scale": 1.02,
+    "palpebral_fissure_width": 1.05,
+    "canthal_tilt_alignment": 1.0,
+    "intercanthal_distance_ratio": 1.0,
+    "upper_eyelid_hooding_scale": 0.98,
+    "lower_lid_retraction_index": 1.0,
+    "orbital_socket_depth_ratio": 1.03,
+    "epicanthic_fold_prominence": 1.0,
+    "lacrimal_caruncle_size": 1.02,
+    "brow_to_lid_clearance": 1.04
+  },
+  "nano_banana_pro_chest_morphology_parameters": {
+    "thoracic_projection_index": 1.4,
+    "mammary_apex_alignment": 1.35,
+    "pectoral_tissue_distribution": 1.3,
+    "sternal_cleavage_width_ratio": 1.35,
+    "gravitational_displacement_coefficient": 1.3,
+    "volume_displacement_scale": 1.45,
+    "anatomical_curvature_fidelity": 1.0,
+    "lateral_tissue_migration_index": 1.3,
+    "submammary_fold_definition": 1.35,
+    "upper_pole_fullness_ratio": 1.4
+  },
+  "anatomical_chest_snippets": {
+    "selected_profile": "heavy_volume",
+    "natural_gravity_physics": "Anatomically correct mammary distribution with realistic gravitational displacement and natural soft-tissue sagging; weight-based volume migration toward the lower pole.",
+    "heavy_volume": "Extreme anterior mammary projection with pronounced gravitational displacement; substantial volume creating deep sternal cleavage; heavy soft-tissue mass causing natural lateral migration and pronounced submammary fold; realistic tissue weight affecting posture and fabric drape."
+  },
+  "nano_banana_pro_gluteal_morphology_parameters": {
+    "posterior_projection_index": 1.0,
+    "gluteal_mass_volume": 1.0,
+    "waist_to_hip_differential": 1.0,
+    "infragluteal_crease_definition": 1.0,
+    "lateral_hip_shelf_width": 1.0,
+    "soft_tissue_jiggle_physics": 1.0
+  },
+  "pose_and_action": {
+    "body_position": "reclining on bed propped against pillows, torso slightly twisted toward camera, left arm extended as if holding phone for selfie, shoulders rolled back to emphasize chest volume, slight arch in upper back from top heavy bust, body weight distributed creating realistic compression in breasts against fabric",
+    "hands": "left arm extended holding phone for selfie",
+    "camera_interaction": "confident knowing gaze with direct eye contact into camera",
+    "framing": "medium close-up selfie vertical"
+  },
+  "scene": {
+    "location": "intimate bedroom",
+    "background_details": "vibrant light blue walls, exposed light wooden plank ceiling, posters, polaroids, stickers, colorful rainbow tie-dye heart decoration, soft white textured blanket and beige patterned sheets pulled up to mid torso",
+    "atmosphere": "casual lived-in bedroom, natural and unposed"
+  },
+  "lighting": {
+    "type": "soft natural daylight from side window",
+    "color_temperature": "5500K",
+    "color_grading": "realistic color grading, true-to-life white balance, no artificial orange filter cast",
+    "details": "gentle modeling on face and body with realistic shadow falloff under chin, breasts and arms",
+    "imperfections": "uneven exposure, natural transitions, no HDR glow"
+  },
+  "camera": {
+    "device": "iPhone",
+    "lens": "24mm equivalent",
+    "settings": "natural depth of field with background softly focused",
+    "quality_markers": "sensor noise, grain, JPEG compression, lens softness at edges"
+  },
+  "style": {
+    "genre": "candid smartphone selfie",
+    "authenticity": "raw, unfiltered, amateur",
+    "technical_style": "photorealistic, hyperrealistic, natural biological skin texture with visible pores and micro-detail",
+    "skin_remaster": "Raw smartphone photo aesthetic with realistic biological details including subtle natural visible pores, micro-texture, peach fuzz. Extremely subtle sensor noise and reduced digital sharpness to mimic real camera lens.",
+    "imperfection_cues": "sensor noise, grain, JPEG artifacts, visible skin pores, flyaway hair, fabric wrinkles, natural facial asymmetry"
+  },
+  "constraints": {
+    "negative_prompts": [
+      "cartoon", "3d render", "illustration", "anime", "drawing",
+      "smooth skin", "plastic skin", "airbrushed", "beauty filter", "CGI",
+      "text", "watermark", "logo",
+      "extra limbs", "deformed", "bad anatomy", "extra fingers",
+      "professional studio lighting", "softbox", "bokeh perfect",
+      "oversaturated", "heavy HDR", "over-sharpening",
+      "low quality", "blurry",
+      "doll face", "uncanny valley", "symmetrical face", "perfect skin",
+      "artificial orange filter", "oversaturated warm cast", "orange skin"
+    ],
+    "rules": [
+      "exact identity from reference image only",
+      "anatomical accuracy",
+      "realistic fabric physics responding to body volume",
+      "natural skin with visible pores, no smoothing",
+      "face must have biological micro-detail from reference"
+    ]
+  },
+  "output": {
+    "count": 1,
+    "size": "1080x1920",
+    "safety": "strict"
+  }
+};
+
+let configData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ============ UI DEFINITIONS ============
+const SECTIONS = [
+  {
+    id: 'project_config',
+    icon: '',
+    title: 'Project Config',
+    fields: [
+      { key: 'aesthetic', type: 'text', label: 'Aesthetic' },
+      { key: 'aspect_ratio', type: 'select', label: 'Aspect Ratio', options: ['1:1','4:3','3:4','16:9','9:16','21:9','4:5'] },
+      { key: 'render_target', type: 'select', label: 'Render Target', options: ['4K_look','8K_look','standard','fast_preview'] }
+    ]
+  },
+  {
+    id: 'subject',
+    icon: '',
+    title: 'Subject',
+    collapsible: true,
+    subsections: [
+      {
+        id: 'subject_main',
+        title: 'Basic Info',
+        fields: [
+          { key: 'description', type: 'textarea', label: 'Description', full: true },
+          { key: 'demographics', type: 'text', label: 'Demographics', full: true }
+        ]
+      },
+      {
+        id: 'subject_body',
+        title: 'Body',
+        fields: [
+          { key: 'body.physique', type: 'textarea', label: 'Physique', full: true },
+          { key: 'body.details', type: 'textarea', label: 'Details', full: true },
+          { key: 'body.skin_tone', type: 'text', label: 'Skin Tone', full: true }
+        ]
+      },
+      {
+        id: 'subject_face',
+        title: 'Face',
+        fields: [
+          { key: 'face.structure', type: 'text', label: 'Structure', full: true },
+          { key: 'face.expression', type: 'textarea', label: 'Expression', full: true },
+          { key: 'face.eyes', type: 'text', label: 'Eyes', full: true },
+          { key: 'face.skin', type: 'textarea', label: 'Skin Details', full: true },
+          { key: 'face.lips', type: 'text', label: 'Lips', full: true },
+          { key: 'face.brows', type: 'text', label: 'Brows', full: true }
+        ]
+      },
+      {
+        id: 'subject_hair',
+        title: 'Hair',
+        fields: [
+          { key: 'hair.style', type: 'text', label: 'Style', full: true },
+          { key: 'hair.color', type: 'text', label: 'Color', full: true },
+          { key: 'hair.texture', type: 'text', label: 'Texture', full: true }
+        ]
+      },
+      {
+        id: 'subject_wardrobe',
+        title: 'Wardrobe',
+        fields: [
+          { key: 'wardrobe.top', type: 'textarea', label: 'Top', full: true },
+          { key: 'wardrobe.bottom', type: 'text', label: 'Bottom', full: true },
+          { key: 'wardrobe.accessories', type: 'text', label: 'Accessories', full: true },
+          { key: 'wardrobe.fabric_notes', type: 'textarea', label: 'Fabric Notes', full: true }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'identity_lock',
+    icon: '',
+    title: 'Identity Lock',
+    fields: [
+      { key: 'status', type: 'select', label: 'Status', options: ['locked','unlocked','partial'] },
+      { key: 'scope', type: 'textarea', label: 'Scope', full: true },
+      { key: 'reference_usage', type: 'textarea', label: 'Reference Usage', full: true },
+      { key: 'identity_consistency_lock', type: 'slider', label: 'Identity Consistency Lock', min: 0.5, max: 2.0, step: 0.05 },
+      { key: 'facial_symmetry_enforcement', type: 'slider', label: 'Facial Symmetry Enforcement', min: 0.5, max: 2.0, step: 0.05 }
+    ]
+  },
+  {
+    id: 'nano_banana_pro_facial_parameters',
+    icon: '',
+    title: 'Facial Parameters',
+    fields: [
+      { key: 'identity_consistency_lock', type: 'slider', label: 'Identity Consistency', min: 0.5, max: 2.0, step: 0.05 },
+      { key: 'facial_symmetry_enforcement', type: 'slider', label: 'Symmetry Enforcement', min: 0.5, max: 2.0, step: 0.05 },
+      { key: 'jawline_definition_scale', type: 'slider', label: 'Jawline Definition', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'cheekbone_prominence_index', type: 'slider', label: 'Cheekbone Prominence', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'nasal_bridge_refinement', type: 'slider', label: 'Nasal Bridge Refinement', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'orbital_depth_precision', type: 'slider', label: 'Orbital Depth', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'labial_fullness_ratio', type: 'slider', label: 'Labial Fullness', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'microtexture_fidelity_multiplier', type: 'slider', label: 'Microtexture Fidelity', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'subsurface_scattering_intensity', type: 'slider', label: 'Subsurface Scattering', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'follicular_detail_density', type: 'slider', label: 'Follicular Detail', min: 0.8, max: 1.5, step: 0.01 }
+    ]
+  },
+  {
+    id: 'nano_banana_pro_eye_parameters',
+    icon: '',
+    title: 'Eye Parameters',
+    fields: [
+      { key: 'sclera_chroma_neutralization', type: 'slider', label: 'Sclera Neutralization', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'waterline_anatomical_separation', type: 'slider', label: 'Waterline Separation', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'iris_micro_detail_depth', type: 'slider', label: 'Iris Detail Depth', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'limbal_ring_definition', type: 'slider', label: 'Limbal Ring', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'pupillary_catchlight_reflectivity', type: 'slider', label: 'Catchlight Reflectivity', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'canthus_vascular_fidelity', type: 'slider', label: 'Canthus Fidelity', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'tear_duct_moisture_index', type: 'slider', label: 'Tear Duct Moisture', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'lower_lid_organic_pigment_scale', type: 'slider', label: 'Lower Lid Pigment', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'corneal_specular_clarity', type: 'slider', label: 'Corneal Clarity', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'orbital_crease_definition', type: 'slider', label: 'Orbital Crease', min: 0.8, max: 1.5, step: 0.01 }
+    ]
+  },
+  {
+    id: 'nano_banana_pro_eye_morphology_parameters',
+    icon: '',
+    title: 'Eye Morphology',
+    fields: [
+      { key: 'eye_aperture_vertical_scale', type: 'slider', label: 'Eye Aperture Scale', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'palpebral_fissure_width', type: 'slider', label: 'Fissure Width', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'canthal_tilt_alignment', type: 'slider', label: 'Canthal Tilt', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'intercanthal_distance_ratio', type: 'slider', label: 'Intercanthal Distance', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'upper_eyelid_hooding_scale', type: 'slider', label: 'Eyelid Hooding', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'lower_lid_retraction_index', type: 'slider', label: 'Lid Retraction', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'orbital_socket_depth_ratio', type: 'slider', label: 'Socket Depth', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'epicanthic_fold_prominence', type: 'slider', label: 'Epicanthic Fold', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'lacrimal_caruncle_size', type: 'slider', label: 'Caruncle Size', min: 0.8, max: 1.5, step: 0.01 },
+      { key: 'brow_to_lid_clearance', type: 'slider', label: 'Brow-Lid Clearance', min: 0.8, max: 1.5, step: 0.01 }
+    ]
+  },
+  {
+    id: 'nano_banana_pro_chest_morphology_parameters',
+    icon: '',
+    title: 'Chest Morphology',
+    fields: [
+      { key: 'thoracic_projection_index', type: 'slider', label: 'Thoracic Projection', min: 0.8, max: 2.0, step: 0.05 },
+      { key: 'mammary_apex_alignment', type: 'slider', label: 'Apex Alignment', min: 0.8, max: 2.0, step: 0.05 },
+      { key: 'pectoral_tissue_distribution', type: 'slider', label: 'Tissue Distribution', min: 0.8, max: 2.0, step: 0.05 },
+      { key: 'sternal_cleavage_width_ratio', type: 'slider', label: 'Cleavage Width', min: 0.8, max: 2.0, step: 0.05 },
+      { key: 'gravitational_displacement_coefficient', type: 'slider', label: 'Gravitational Displacement', min: 0.8, max: 2.0, step: 0.05 },
+      { key: 'volume_displacement_scale', type: 'slider', label: 'Volume Displacement', min: 0.8, max: 2.0, step: 0.05 },
+      { key: 'anatomical_curvature_fidelity', type: 'slider', label: 'Curvature Fidelity', min: 0.8, max: 2.0, step: 0.05 },
+      { key: 'lateral_tissue_migration_index', type: 'slider', label: 'Tissue Migration', min: 0.8, max: 2.0, step: 0.05 },
+      { key: 'submammary_fold_definition', type: 'slider', label: 'Submammary Fold', min: 0.8, max: 2.0, step: 0.05 },
+      { key: 'upper_pole_fullness_ratio', type: 'slider', label: 'Upper Pole Fullness', min: 0.8, max: 2.0, step: 0.05 }
+    ]
+  },
+  {
+    id: 'anatomical_chest_snippets',
+    icon: '',
+    title: 'Chest Snippets',
+    fields: [
+      { key: 'selected_profile', type: 'select', label: 'Profile', options: ['natural','moderate_volume','heavy_volume','extreme'] },
+      { key: 'natural_gravity_physics', type: 'textarea', label: 'Gravity Physics', full: true },
+      { key: 'heavy_volume', type: 'textarea', label: 'Heavy Volume Profile', full: true }
+    ]
+  },
+  {
+    id: 'nano_banana_pro_gluteal_morphology_parameters',
+    icon: '',
+    title: 'Gluteal Morphology',
+    fields: [
+      { key: 'posterior_projection_index', type: 'slider', label: 'Posterior Projection', min: 0.5, max: 2.0, step: 0.05 },
+      { key: 'gluteal_mass_volume', type: 'slider', label: 'Mass Volume', min: 0.5, max: 2.0, step: 0.05 },
+      { key: 'waist_to_hip_differential', type: 'slider', label: 'Waist-Hip Differential', min: 0.5, max: 2.0, step: 0.05 },
+      { key: 'infragluteal_crease_definition', type: 'slider', label: 'Crease Definition', min: 0.5, max: 2.0, step: 0.05 },
+      { key: 'lateral_hip_shelf_width', type: 'slider', label: 'Hip Shelf Width', min: 0.5, max: 2.0, step: 0.05 },
+      { key: 'soft_tissue_jiggle_physics', type: 'slider', label: 'Jiggle Physics', min: 0.5, max: 2.0, step: 0.05 }
+    ]
+  },
+  {
+    id: 'pose_and_action',
+    icon: '',
+    title: 'Pose & Action',
+    fields: [
+      { key: 'body_position', type: 'textarea', label: 'Body Position', full: true },
+      { key: 'hands', type: 'text', label: 'Hands', full: true },
+      { key: 'camera_interaction', type: 'text', label: 'Camera Interaction', full: true },
+      { key: 'framing', type: 'text', label: 'Framing', full: true }
+    ]
+  },
+  {
+    id: 'scene',
+    icon: '',
+    title: 'Scene',
+    fields: [
+      { key: 'location', type: 'text', label: 'Location' },
+      { key: 'background_details', type: 'textarea', label: 'Background Details', full: true },
+      { key: 'atmosphere', type: 'textarea', label: 'Atmosphere', full: true }
+    ]
+  },
+  {
+    id: 'lighting',
+    icon: '',
+    title: 'Lighting',
+    fields: [
+      { key: 'type', type: 'text', label: 'Light Type' },
+      { key: 'color_temperature', type: 'text', label: 'Color Temp' },
+      { key: 'color_grading', type: 'textarea', label: 'Color Grading', full: true },
+      { key: 'details', type: 'textarea', label: 'Details', full: true },
+      { key: 'imperfections', type: 'text', label: 'Imperfections', full: true }
+    ]
+  },
+  {
+    id: 'camera',
+    icon: '',
+    title: 'Camera',
+    fields: [
+      { key: 'device', type: 'text', label: 'Device' },
+      { key: 'lens', type: 'text', label: 'Lens' },
+      { key: 'settings', type: 'textarea', label: 'Settings', full: true },
+      { key: 'quality_markers', type: 'textarea', label: 'Quality Markers', full: true }
+    ]
+  },
+  {
+    id: 'style',
+    icon: '',
+    title: 'Style',
+    fields: [
+      { key: 'genre', type: 'text', label: 'Genre' },
+      { key: 'authenticity', type: 'text', label: 'Authenticity' },
+      { key: 'technical_style', type: 'textarea', label: 'Technical Style', full: true },
+      { key: 'skin_remaster', type: 'textarea', label: 'Skin Remaster', full: true },
+      { key: 'imperfection_cues', type: 'textarea', label: 'Imperfection Cues', full: true }
+    ]
+  },
+  {
+    id: 'constraints',
+    icon: '',
+    title: 'Constraints',
+    fields: [
+      { key: 'negative_prompts', type: 'tags', label: 'Negative Prompts' },
+      { key: 'rules', type: 'tags', label: 'Rules' }
+    ]
+  },
+  {
+    id: 'output',
+    icon: '',
+    title: 'Output',
+    fields: [
+      { key: 'count', type: 'number', label: 'Count', min: 1, max: 10 },
+      { key: 'size', type: 'select', label: 'Size', options: ['1024x1024','1080x1920','1920x1080','2048x2048','4096x4096','512x768','768x1344'] },
+      { key: 'safety', type: 'select', label: 'Safety', options: ['strict','moderate','off'] }
+    ]
+  }
+];
+
+// ============ HELPER: Get/Set nested values ============
+function getNestedValue(obj, path) {
+  return path.split('.').reduce((o, k) => o && o[k], obj);
+}
+
+function setNestedValue(obj, path, value) {
+  const keys = path.split('.');
+  let target = obj;
+  for (let i = 0; i < keys.length - 1; i++) {
+    target = target[keys[i]];
+  }
+  target[keys[keys.length - 1]] = value;
+}
+
+// ============ RENDER UI ============
+function renderSections() {
+  const container = document.getElementById('mainContent');
+  container.innerHTML = '';
+  renderSectionNav();
+
+  SECTIONS.forEach(section => {
+    const el = document.createElement('div');
+    el.className = reduceMotion ? 'section' : 'section motion-enter';
+    el.dataset.sectionId = section.id;
+
+    let bodyHTML = '';
+
+    if (section.subsections) {
+      section.subsections.forEach(sub => {
+        bodyHTML += `<div class="subsection"><h3 style="font-size:.9rem;color:var(--accent);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)">${sub.title}</h3>`;
+        sub.fields.forEach(f => { bodyHTML += renderField(section.id, f); });
+        bodyHTML += `</div>`;
+      });
+    } else {
+      section.fields.forEach(f => { bodyHTML += renderField(section.id, f); });
+    }
+
+    el.innerHTML = `
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" onclick="toggleSection(this)" onkeydown="handleSectionKey(event,this)">
+        <h2>${section.title}</h2>
+        <span class="toggle">v</span>
+      </div>
+      <div class="section-body">${bodyHTML}</div>
+    `;
+    container.appendChild(el);
+  });
+  updateStats();
+  syncActiveNav();
+  animateSections();
+}
+
+function animateSections() {
+  if (reduceMotion) return;
+  const sections = Array.from(document.querySelectorAll('.section.motion-enter'));
+  sections.forEach((section, index) => {
+    section.style.animationDelay = `${Math.min(index * 45, 420)}ms`;
+    requestAnimationFrame(() => {
+      section.classList.add('motion-visible');
+      section.classList.remove('motion-enter');
+    });
+  });
+}
+
+function renderSectionNav() {
+  const nav = document.getElementById('sectionNav');
+  if (!nav) return;
+  nav.innerHTML = '<div class="side-nav-title">Abschnitte</div>';
+  SECTIONS.forEach(section => {
+    const button = document.createElement('button');
+    button.className = 'nav-item';
+    button.type = 'button';
+    button.dataset.sectionId = section.id;
+    button.innerHTML = `<span>${section.title}</span><span class="nav-dot"></span>`;
+    button.onclick = () => scrollToSection(section.id);
+    nav.appendChild(button);
+  });
+}
+
+function scrollToSection(sectionId) {
+  const section = document.querySelector(`.section[data-section-id="${sectionId}"]`);
+  if (!section) return;
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setActiveNav(sectionId);
+}
+
+function setActiveNav(sectionId) {
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.sectionId === sectionId);
+  });
+}
+
+function syncActiveNav() {
+  document.querySelectorAll('.section').forEach(section => {
+    const item = document.querySelector(`.nav-item[data-section-id="${section.dataset.sectionId}"]`);
+    if (item) item.style.display = section.style.display === 'none' ? 'none' : '';
+  });
+  const firstVisible = Array.from(document.querySelectorAll('.section'))
+    .find(section => section.style.display !== 'none');
+  if (firstVisible) setActiveNav(firstVisible.dataset.sectionId);
+}
+
+function handleSectionKey(event, header) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    toggleSection(header);
+  }
+}
+
+function renderField(sectionId, field) {
+  const val = getNestedValue(configData, sectionId + '.' + field.key);
+  const fullClass = field.full ? 'style="grid-column:1/-1"' : '';
+  let inputHTML = '';
+
+  switch (field.type) {
+    case 'text':
+      inputHTML = `<input type="text" value="${escapeHTML(val)}" onchange="updateField('${sectionId}','${field.key}',this.value)">`;
+      break;
+    case 'textarea':
+      inputHTML = `<textarea onchange="updateField('${sectionId}','${field.key}',this.value)">${escapeHTML(val)}</textarea>`;
+      break;
+    case 'select':
+      inputHTML = `<select onchange="updateField('${sectionId}','${field.key}',this.value)">
+        ${field.options.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}
+      </select>`;
+      break;
+    case 'number':
+      inputHTML = `<input type="number" inputmode="numeric" value="${val}" min="${field.min||0}" max="${field.max||100}" step="1" onchange="updateField('${sectionId}','${field.key}',parseInt(this.value))">`;
+      break;
+    case 'slider':
+      inputHTML = `<div class="slider-field">
+        <label>${field.label} <span class="val">${val}</span></label>
+        <div class="slider-wrap">
+          <input type="range" min="${field.min}" max="${field.max}" step="${field.step}" value="${val}" 
+            oninput="updateSlider(this,'${sectionId}','${field.key}')">
+          <span class="slider-value">${val}</span>
+        </div>
+      </div>`;
+      return inputHTML; // slider has its own label
+    case 'tags':
+      inputHTML = `<div class="tags-container" id="tags-${sectionId}-${field.key}">
+        ${(Array.isArray(val) ? val : []).map((t, i) => `<span class="tag">${escapeHTML(t)}<span class="remove" onclick="removeTag('${sectionId}','${field.key}',${i})">x</span></span>`).join('')}
+      </div>
+      <div class="tag-input-wrap">
+        <input type="text" placeholder="Neuen Tag hinzufuegen..." onkeydown="if(event.key==='Enter'){addTag('${sectionId}','${field.key}',this);event.preventDefault()}">
+      </div>`;
+      return `<div class="field" ${fullClass}><label>${field.label}</label>${inputHTML}</div>`;
+  }
+
+  return `<div class="field" ${fullClass}><label>${field.label}</label>${inputHTML}</div>`;
+}
+
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============ INTERACTIONS ============
+function toggleSection(header) {
+  const body = header.nextElementSibling;
+  const isHidden = body.classList.contains('hidden');
+  header.classList.toggle('collapsed', !isHidden);
+  header.setAttribute('aria-expanded', String(isHidden));
+
+  if (reduceMotion) {
+    body.classList.toggle('hidden', !isHidden);
+    return;
+  }
+
+  if (isHidden) {
+    body.classList.remove('hidden');
+    body.animate(
+      [
+        { opacity: 0, transform: 'scaleY(.96) translateY(-8px)' },
+        { opacity: 1, transform: 'scaleY(1) translateY(0)' }
+      ],
+      { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)' }
+    );
+  } else {
+    const animation = body.animate(
+      [
+        { opacity: 1, transform: 'scaleY(1) translateY(0)' },
+        { opacity: 0, transform: 'scaleY(.96) translateY(-8px)' }
+      ],
+      { duration: 180, easing: 'cubic-bezier(.4,0,.2,1)' }
+    );
+    animation.onfinish = () => body.classList.add('hidden');
+  }
+}
+
+function updateField(sectionId, key, value) {
+  setNestedValue(configData, sectionId + '.' + key, value);
+  updatePreview();
+}
+
+function updateSlider(el, sectionId, key) {
+  const val = parseFloat(el.value);
+  const parent = el.closest('.slider-field');
+  parent.querySelector('.val').textContent = val.toFixed(2);
+  parent.querySelector('.slider-value').textContent = val.toFixed(2);
+  setNestedValue(configData, sectionId + '.' + key, val);
+  updatePreview();
+}
+
+function addTag(sectionId, key, input) {
+  const val = input.value.trim();
+  if (!val) return;
+  const arr = getNestedValue(configData, sectionId + '.' + key);
+  if (!arr.includes(val)) {
+    arr.push(val);
+    input.value = '';
+    renderSections();
+    updatePreview();
+    animateNewTags();
+  }
+}
+
+function animateNewTags() {
+  if (reduceMotion) return;
+  document.querySelectorAll('.tag').forEach(tag => {
+    tag.classList.add('motion-new');
+    tag.addEventListener('animationend', () => tag.classList.remove('motion-new'), { once: true });
+  });
+}
+
+function removeTag(sectionId, key, index) {
+  const arr = getNestedValue(configData, sectionId + '.' + key);
+  arr.splice(index, 1);
+  renderSections();
+  updatePreview();
+}
+
+// ============ JSON PREVIEW ============
+function updatePreview() {
+  const json = JSON.stringify(configData, null, 2);
+  const preview = document.getElementById('jsonPreview');
+  preview.innerHTML = syntaxHighlight(json);
+  document.getElementById('charCount').textContent = json.length + ' Zeichen';
+  const jsonSize = document.getElementById('jsonSize');
+  if (jsonSize) jsonSize.textContent = json.length + ' Zeichen';
+}
+
+function updateStats() {
+  const sectionCount = document.getElementById('sectionCount');
+  const fieldCount = document.getElementById('fieldCount');
+  if (sectionCount) sectionCount.textContent = SECTIONS.length;
+  if (fieldCount) {
+    const total = SECTIONS.reduce((sum, section) => {
+      if (section.subsections) {
+        return sum + section.subsections.reduce((subSum, sub) => subSum + sub.fields.length, 0);
+      }
+      return sum + section.fields.length;
+    }, 0);
+    fieldCount.textContent = total;
+  }
+}
+
+function syntaxHighlight(json) {
+  return json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"([^"]+)":/g, '<span class="key">"$1":</span>')
+    .replace(/: "([^"]*)"/g, ': <span class="string">"$1"</span>')
+    .replace(/: (\d+\.?\d*)/g, ': <span class="number">$1</span>')
+    .replace(/: (true|false)/g, ': <span class="bool">$1</span>');
+}
+
+// ============ ACTIONS ============
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('show');
+  void t.offsetWidth;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function exportJSON() {
+  const json = JSON.stringify(configData, null, 2);
+  navigator.clipboard.writeText(json).then(() => showToast('JSON kopiert!'));
+}
+
+function downloadJSON() {
+  const json = JSON.stringify(configData, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'nano_banana_config.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Datei heruntergeladen!');
+}
+
+function importJSON() {
+  document.getElementById('fileInput').click();
+}
+
+function handleFileImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      configData = data;
+      renderSections();
+      updatePreview();
+      showToast('Konfiguration importiert!');
+    } catch (err) {
+      showToast('Ungueltige JSON-Datei');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetDefaults() {
+  if (confirm('Alle Einstellungen zuruecksetzen?')) {
+    configData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    renderSections();
+    updatePreview();
+    showToast('Zurueckgesetzt');
+  }
+}
+
+// ============ SEARCH ============
+function searchFields(query) {
+  const q = query.toLowerCase().trim();
+  document.querySelectorAll('.section').forEach(sec => {
+    if (!q) {
+      sec.style.display = '';
+      sec.querySelectorAll('.field').forEach(f => f.style.display = '');
+      return;
+    }
+    let found = false;
+    sec.querySelectorAll('.field').forEach(f => {
+      const text = f.textContent.toLowerCase();
+      if (text.includes(q)) {
+        f.style.display = '';
+        found = true;
+      } else {
+        f.style.display = 'none';
+      }
+    });
+    sec.style.display = found ? '' : 'none';
+  });
+  syncActiveNav();
+}
+
+// ============ INIT ============
+document.body.classList.add('motion-ready');
+renderSections();
+updatePreview();
+</script>
+</body>
+</html>
+
+
+
