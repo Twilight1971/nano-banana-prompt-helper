@@ -130,6 +130,18 @@ This repository includes a GitHub Actions workflow for publishing the WebApp fro
 
 In GitHub, enable Pages with GitHub Actions as the source, then run the `Deploy Web App` workflow or push changes to `web/`.
 
+Required GitHub setting:
+
+```text
+Settings -> Pages -> Build and deployment -> Source -> GitHub Actions
+```
+
+After the workflow succeeds, the WebApp will be available at:
+
+```text
+https://twilight1971.github.io/nano-banana-prompt-helper/
+```
+
 ## Development
 
 Most of the UI lives in:
