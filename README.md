@@ -6,12 +6,6 @@ Windows desktop wrapper for a local HTML prompt-configuration dashboard. The app
 
 ![Nano Banana Prompt Helper screenshot](docs/app-screenshot.png)
 
-## Download
-
-The current Windows executable is included in this repository:
-
-[Download NanoBananaPromptHelper.exe](release/NanoBananaPromptHelper.exe)
-
 ## Features
 
 - Single-file Windows executable output
@@ -33,8 +27,6 @@ The current Windows executable is included in this repository:
 |-- docs/
 |   |-- BUILD.md
 |   `-- app-screenshot.png
-|-- release/
-|   `-- NanoBananaPromptHelper.exe
 |-- scripts/
 |   `-- build.ps1
 |-- src/
@@ -73,6 +65,22 @@ Optional: if WebView2 SDK files are stored somewhere else, pass the path:
 powershell -ExecutionPolicy Bypass -File .\scripts\build.ps1 -WebView2SdkDir "C:\path\to\webview2"
 ```
 
+## Build & Run
+
+1. Clone or download this repository.
+2. Open PowerShell in the repository root.
+3. Build the Windows app:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\build.ps1
+```
+
+4. Start the generated executable:
+
+```powershell
+.\dist-single\NanoBananaPromptHelper.exe
+```
+
 ## Development
 
 Most of the UI lives in:
@@ -94,7 +102,7 @@ After editing either file, run the build script again.
 - The generated `.exe` embeds the HTML app, logo, splash image, icon resources, and WebView2 loader files.
 - At runtime the app extracts internal files into `%LocalAppData%\NanoBananaPromptHelper\Runtime\<process-id>`.
 - `dist/` and `dist-single/` are build outputs and are intentionally ignored by Git.
-- `release/NanoBananaPromptHelper.exe` is committed for convenient direct download.
+- No generated `.exe` file is committed to the repository. Build locally with `scripts/build.ps1`.
 
 ## License
 
