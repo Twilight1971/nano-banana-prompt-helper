@@ -122,24 +122,25 @@ powershell -ExecutionPolicy Bypass -File .\scripts\sync-web.ps1
 
 ## GitHub Pages
 
-This repository includes a GitHub Actions workflow for publishing the WebApp from the `web/` folder:
+The WebApp is published from the dedicated `gh-pages` branch. In GitHub, use this Pages setting:
 
 ```text
-.github/workflows/pages.yml
+Settings -> Pages -> Build and deployment
+Source: Deploy from a branch
+Branch: gh-pages
+Folder: / (root)
 ```
 
-In GitHub, enable Pages with GitHub Actions as the source, then run the `Deploy Web App` workflow or push changes to `web/`.
-
-Required GitHub setting:
-
-```text
-Settings -> Pages -> Build and deployment -> Source -> GitHub Actions
-```
-
-After the workflow succeeds, the WebApp will be available at:
+After GitHub Pages finishes publishing, the WebApp will be available at:
 
 ```text
 https://twilight1971.github.io/nano-banana-prompt-helper/
+```
+
+To update the published WebApp after changing files in `web/`, run:
+
+```powershell
+git subtree push --prefix web origin gh-pages
 ```
 
 ## Development
